@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Pizza Party ESL Homework | Interactive A2 Lesson</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none; /* better for drag/drop but text select still possible */
+        }
+
+        body {
+            background: linear-gradient(145deg, #f9e3b3 0%, #f7c56e 100%);
+            font-family: 'Comic Neue', 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI Emoji', cursive, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* main container */
+        .lesson-container {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(255, 248, 225, 0.95);
+            border-radius: 80px 80px 70px 70px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,200,0.8);
+            overflow: hidden;
+            padding: 20px 25px 35px;
+            transition: all 0.2s;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3.2rem;
+            margin: 0 0 5px 0;
+            background: #d43f1f;
+            background: linear-gradient(135deg, #e65c1e, #b3310c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 3px 3px 0 #ffdd99;
+            letter-spacing: 2px;
+        }
+
+        .sub {
+            text-align: center;
+            font-size: 1.2rem;
+            background: #ffefb9;
+            display: inline-block;
+            width: auto;
+            margin: 0 auto 20px;
+            padding: 5px 20px;
+            border-radius: 40px;
+            color: #a33f1a;
+            font-weight: bold;
+            box-shadow: inset 0 0 2px #ffc285, 0 3px 6px rgba(0,0,0,0.05);
+        }
+
+        .story-card {
+            background: #fff5e6;
+            border-radius: 60px;
+            padding: 20px 25px;
+            margin-bottom: 30px;
+            border: 3px solid #ffbc7a;
+            box-shadow: 0 12px 0 #c97e3a;
+            transition: transform 0.1s ease;
+        }
+
+        .story-text {
+            font-size: 1.35rem;
+            line-height: 1.5;
+            font-weight: 500;
+            color: #442100;
+            background: #fff0dc;
+            padding: 18px 20px;
+            border-radius: 50px;
+            text-align: center;
+        }
+
+        .story-text span {
+            background: #ffd966;
+            padding: 2px 8px;
+            border-radius: 50px;
+            display: inline-block;
+            margin: 0 2px;
+        }
+
+        .section {
+            background: #fffaf0;
+            border-radius: 50px;
+            margin-bottom: 35px;
+            padding: 15px 20px 25px;
+            box-shadow: 0 8px 0 #e9c48b;
+            transition: all 0.2s;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8d99c;
+            display: inline-flex;
+            padding: 6px 25px 6px 20px;
+            border-radius: 60px;
+            margin-bottom: 25px;
+            color: #4b2a0e;
+            border: 1px solid #ffd58c;
+        }
+
+        .grid-2col {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+        }
+
+        /* presentation grid flashcard style */
+        .flashcard {
+            background: #fef3df;
+            border-radius: 48px;
+            padding: 15px;
+            flex: 1;
+            min-width: 220px;
+            text-align: center;
+            border: 2px solid #ffc285;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .flashcard:hover {
+            transform: scale(0.98);
+            background: #ffefcf;
+        }
+        .emoji-big {
+            font-size: 4rem;
+            display: block;
+        }
+        .sentence {
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: #fff1e0;
+            margin-top: 10px;
+            border-radius: 40px;
+            padding: 8px;
+        }
+
+        /* PRACTICE - memo game style (matching pairs) */
+        .memo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 130px));
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .memo-card {
+            background: #ffe2b5;
+            border-radius: 28px;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.6rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.18s ease;
+            box-shadow: 0 8px 0 #b97f42;
+            transform: translateY(-2px);
+            color: #3e2a1a;
+            border: 2px solid #ffb45e;
+        }
+        .memo-card.flipped {
+            background: #b7d968;
+            box-shadow: 0 4px 0 #6f9e2e;
+            transform: translateY(2px);
+            cursor: default;
+            border-color: #5d8c1b;
+        }
+        .memo-card.matched {
+            visibility: hidden;
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: 0.2s;
+        }
+        .memo-card span {
+            font-size: 2rem;
+        }
+
+        /* PRODUCTION - interactive quiz with drag&drop style + fill */
+        .quiz-block {
+            background: #ffebcc;
+            border-radius: 40px;
+            padding: 20px;
+        }
+        .task-row {
+            background: #fff3e2;
+            border-radius: 50px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px;
+            justify-content: space-between;
+        }
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: bold;
+            flex: 2;
+        }
+        .options {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .option-btn {
+            background: #fdcb6e;
+            border: none;
+            font-size: 1.1rem;
+            padding: 8px 22px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.1s;
+            color: #3b2a1f;
+            box-shadow: 0 3px 0 #a45d2a;
+        }
+        .option-btn:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+        .feedback {
+            font-size: 1rem;
+            font-weight: bold;
+            min-width: 110px;
+            text-align: center;
+        }
+        .correct-fb {
+            color: #2c6e2c;
+            background: #d9ffd0;
+            border-radius: 60px;
+            padding: 5px 15px;
+        }
+        .wrong-fb {
+            color: #b13b00;
+            background: #ffe0cf;
+            border-radius: 60px;
+            padding: 5px 15px;
+        }
+        .btn-reset {
+            background: #f0aa4b;
+            border: none;
+            font-family: inherit;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 8px 20px;
+            border-radius: 50px;
+            margin-top: 15px;
+            cursor: pointer;
+            color: #2e1b0a;
+            transition: 0.1s;
+            box-shadow: 0 3px 0 #774e24;
+        }
+        .btn-reset:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+        .score-area {
+            text-align: right;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: #ffe1b3;
+            display: inline-block;
+            padding: 5px 20px;
+            border-radius: 30px;
+            margin-bottom: 10px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #a5511c;
+        }
+        @media (max-width: 720px) {
+            .lesson-container {
+                padding: 15px;
+            }
+            .story-text {
+                font-size: 1rem;
+            }
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+        button {
+            font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+        }
+    </style>
+</head>
+<body>
+<div class="lesson-container">
+    <h1>🍕 PIZZA PARTY FUN! 🎉</h1>
+    <div style="text-align: center;"><div class="sub">⭐ A2 English · Homework + Games ⭐</div></div>
+
+    <!-- 📖 STORY (Presentation Stage) -->
+    <div class="story-card">
+        <div style="display: flex; align-items: center; gap: 15px; justify-content: center; margin-bottom: 10px;">
+            <span>📖</span> <span style="font-weight: bold; font-size: 1.6rem;">Our Pizza Story</span> <span>🍅</span>
+        </div>
+        <div class="story-text">
+            🧑‍🍳 Mike has a pizza party. He invites his friends. They make pizza together.<br>
+            🍅 Anna, Kevin and Tom like <span>tomatoes and mushrooms</span>. So the kids add them to the pizza.<br>
+            🌶️ Ben and Mike <span>hate pepper</span>. And the friends don't add them to the pizza.<br>
+            🧀 They also add <span>a lot of cheese</span>.<br>
+            😋 Everyone likes this pizza! They eat pizza and drink cola. They play music and games.<br>
+            🧹 After the party, they clean up the mess. It was fun!
+        </div>
+    </div>
+
+    <!-- 1️⃣ PRESENTATION (PPP) - Key grammar & vocab presentation with interactive touch -->
+    <div class="section">
+        <div class="section-title"><span>🎤</span> 1. PRESENTATION <span>📚</span></div>
+        <div class="grid-2col">
+            <div class="flashcard" onclick="speakText('There is a lot of cheese on the pizza.')">
+                <span class="emoji-big">🧀🧀🧀</span>
+                <div class="sentence">"There is a lot of cheese."</div>
+                <div style="font-size:0.8rem;">👇 click to listen</div>
+            </div>
+            <div class="flashcard" onclick="speakText('There are tomatoes and mushrooms on the pizza.')">
+                <span class="emoji-big">🍅🍄</span>
+                <div class="sentence">"There are tomatoes and mushrooms."</div>
+                <div style="font-size:0.8rem;">👇 click to listen</div>
+            </div>
+            <div class="flashcard" onclick="speakText('There isn\'t any pepper. Ben and Mike hate pepper.')">
+                <span class="emoji-big">🚫🌶️</span>
+                <div class="sentence">"There isn't any pepper."</div>
+                <div style="font-size:0.8rem;">👇 click to listen</div>
+            </div>
+            <div class="flashcard" onclick="speakText('Everyone likes the pizza. They drink cola and play games.')">
+                <span class="emoji-big">🎮🥤</span>
+                <div class="sentence">"They play music and games."</div>
+                <div style="font-size:0.8rem;">👇 click to listen</div>
+            </div>
+        </div>
+        <p style="text-align:center; margin-top:15px;">✨ Tap any card to hear the sentence! ✨</p>
+    </div>
+
+    <!-- 2️⃣ PRACTICE - MEMORY MATCH (MEMO GAME) using story elements -->
+    <div class="section">
+        <div class="section-title"><span>🧩</span> 2. PRACTICE · Memo Match <span>🎴</span></div>
+        <p><strong>🔁 Match the sentence with the correct picture!</strong> Turn two cards, find pairs.</p>
+        <div id="memoGameGrid" class="memo-grid"></div>
+        <div style="display: flex; justify-content: center; gap: 20px; align-items: center; margin-top: 10px;">
+            <button class="btn-reset" id="resetMemoBtn">🔄 New Game (Memo)</button>
+            <span id="memoStatus" style="background:#eeddbb; padding:5px 15px; border-radius:40px;">⭐ Find 6 pairs!</span>
+        </div>
+    </div>
+
+    <!-- 3️⃣ PRODUCTION - Interactive Quiz (True/False & choices) based on story -->
+    <div class="section">
+        <div class="section-title"><span>🎯</span> 3. PRODUCTION · Prove you're a Pizza Chef! <span>🍕✅</span></div>
+        <div class="quiz-block">
+            <div id="quizArea">
+                <!-- js will inject dynamic questions or static with feedback -->
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <button class="btn-reset" id="resetQuizBtn">🔄 Try again (Quiz)</button>
+                <div id="quizScore" class="score-area">⭐ Score: 0 / 5</div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        🎉 Great job! You read, matched, and answered. Share your pizza party with your teacher! 🎉
+    </footer>
+</div>
+
+<script>
+    // SPEECH UTILITY (presentation)
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            speechSynthesis.cancel();
+            speechSynthesis.speak(utterance);
+        } else {
+            alert("🔊 Your browser doesn't support speech, but you can read: " + text);
+        }
+    }
+
+    // ---------- MEMORY GAME (practice) ----------
+    // pairs: [emoji/text] matching with description from story
+    const pairsData = [
+        { pairId: 1, display: "🍅🍄", matchText: "They add tomatoes and mushrooms." },
+        { pairId: 2, display: "🌶️🚫", matchText: "No pepper! Ben & Mike hate it." },
+        { pairId: 3, display: "🧀🧀", matchText: "They add a lot of cheese." },
+        { pairId: 4, display: "😋🍕", matchText: "Everyone likes the pizza." },
+        { pairId: 5, display: "🧹✨", matchText: "After party they clean up." },
+        { pairId: 6, display: "🥤🎵", matchText: "They drink cola and play music." }
+    ];
+
+    let memoCards = [];
+    let flippedIndices = [];
+    let lockBoard = false;
+    let matchedCount = 0;
+
+    function buildMemoArray() {
+        let cards = [];
+        pairsData.forEach((pair, idx) => {
+            // type 'img' side
+            cards.push({ id: idx, pairId: pair.pairId, type: 'icon', content: pair.display, matchKey: pair.matchText });
+            cards.push({ id: idx, pairId: pair.pairId, type: 'text', content: pair.matchText, matchKey: pair.matchText });
+        });
+        // shuffle
+        for (let i = cards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [cards[i], cards[j]] = [cards[j], cards[i]];
+        }
+        return cards;
+    }
+
+    let currentMemoCards = [];
+    let memoContainer = document.getElementById('memoGameGrid');
+    let memoStatusSpan = document.getElementById('memoStatus');
+
+    function renderMemo() {
+        memoContainer.innerHTML = '';
+        currentMemoCards.forEach((card, idx) => {
+            const cardDiv = document.createElement('div');
+            cardDiv.classList.add('memo-card');
+            if (card.matched) {
+                cardDiv.classList.add('matched');
+                cardDiv.innerHTML = '<span>✔️</span>';
+            } else if (card.flipped) {
+                cardDiv.classList.add('flipped');
+                if (card.type === 'icon') {
+                    cardDiv.innerHTML = `<span style="font-size:2.8rem;">${card.content}</span>`;
+                } else {
+                    cardDiv.innerHTML = `<span style="font-size:0.85rem; padding:8px; text-align:center;">${card.content}</span>`;
+                }
+            } else {
+                cardDiv.innerHTML = '<span>❓</span>';
+            }
+            cardDiv.addEventListener('click', () => onCardClick(idx));
+            memoContainer.appendChild(cardDiv);
+        });
+        let matchedTotal = currentMemoCards.filter(c => c.matched).length / 2;
+        memoStatusSpan.innerText = `🎯 Matched pairs: ${matchedTotal} / ${pairsData.length}`;
+        if (matchedTotal === pairsData.length) {
+            memoStatusSpan.innerText = "🏆 PERFECT! You mastered the story! 🎉";
+        }
+    }
+
+    function onCardClick(idx) {
+        if (lockBoard) return;
+        const card = currentMemoCards[idx];
+        if (card.matched || card.flipped) return;
+        card.flipped = true;
+        flippedIndices.push(idx);
+        renderMemo();
+        if (flippedIndices.length === 2) {
+            lockBoard = true;
+            const idxA = flippedIndices[0];
+            const idxB = flippedIndices[1];
+            const cardA = currentMemoCards[idxA];
+            const cardB = currentMemoCards[idxB];
+            // check match based on pairId
+            let isMatch = (cardA.pairId === cardB.pairId);
+            if (isMatch) {
+                cardA.matched = true;
+                cardB.matched = true;
+                cardA.flipped = false;
+                cardB.flipped = false;
+                flippedIndices = [];
+                lockBoard = false;
+                renderMemo();
+                // check win
+                let allMatched = currentMemoCards.every(c => c.matched === true);
+                if (allMatched) memoStatusSpan.innerText = "🏆 PERFECT! You mastered the story! 🎉";
+            } else {
+                setTimeout(() => {
+                    cardA.flipped = false;
+                    cardB.flipped = false;
+                    flippedIndices = [];
+                    lockBoard = false;
+                    renderMemo();
+                }, 700);
+            }
+        }
+    }
+
+    function resetMemoGame() {
+        currentMemoCards = buildMemoArray().map(c => ({ ...c, flipped: false, matched: false }));
+        flippedIndices = [];
+        lockBoard = false;
+        matchedCount = 0;
+        renderMemo();
+    }
+
+    // ---------- PRODUCTION QUIZ (5 interactive questions) ----------
+    const quizQuestions = [
+        { text: "🍅 Do Anna, Kevin and Tom like tomatoes and mushrooms?", correct: true, explanation: "Yes, they like them and add them to the pizza." },
+        { text: "🌶️ Do Ben and Mike love pepper?", correct: false, explanation: "No, they hate pepper. So the friends don't add it." },
+        { text: "🧀 Do they add only a little cheese?", correct: false, explanation: "They add a LOT of cheese! Yummy!" },
+        { text: "🧹 After the party, do they leave the mess?", correct: false, explanation: "No, they clean up the mess. It's important!" },
+        { text: "🎉 Does everyone like the pizza? Do they have fun?", correct: true, explanation: "Yes! Everyone likes pizza and it was fun!" }
+    ];
+
+    let quizState = quizQuestions.map(() => ({ answered: false, userCorrect: null }));
+    let totalScore = 0;
+    const quizContainer = document.getElementById('quizArea');
+    const quizScoreSpan = document.getElementById('quizScore');
+
+    function updateQuizScoreUI() {
+        let answeredCount = quizState.filter(s => s.answered === true).length;
+        let correctCount = quizState.filter(s => s.userCorrect === true).length;
+        totalScore = correctCount;
+        quizScoreSpan.innerHTML = `⭐ Score: ${correctCount} / ${quizQuestions.length}`;
+        if (correctCount === quizQuestions.length && answeredCount === quizQuestions.length) {
+            quizScoreSpan.innerHTML = `🏅 PERFECT SCORE! 🍕🎉 You're a Pizza Champion! ⭐ ${correctCount}/${quizQuestions.length}`;
+        }
+    }
+
+    function renderQuiz() {
+        quizContainer.innerHTML = '';
+        quizQuestions.forEach((q, idx) => {
+            const state = quizState[idx];
+            const row = document.createElement('div');
+            row.className = 'task-row';
+            const qTextDiv = document.createElement('div');
+            qTextDiv.className = 'question-text';
+            qTextDiv.innerHTML = `${idx+1}. ${q.text}`;
+            row.appendChild(qTextDiv);
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'options';
+            const trueBtn = document.createElement('button');
+            trueBtn.innerText = '✅ TRUE';
+            trueBtn.className = 'option-btn';
+            const falseBtn = document.createElement('button');
+            falseBtn.innerText = '❌ FALSE';
+            falseBtn.className = 'option-btn';
+            const feedbackSpan = document.createElement('div');
+            feedbackSpan.className = 'feedback';
+
+            if (!state.answered) {
+                trueBtn.onclick = () => handleAnswer(idx, true, feedbackSpan, trueBtn, falseBtn);
+                falseBtn.onclick = () => handleAnswer(idx, false, feedbackSpan, trueBtn, falseBtn);
+                optionsDiv.appendChild(trueBtn);
+                optionsDiv.appendChild(falseBtn);
+            } else {
+                trueBtn.disabled = true; falseBtn.disabled = true;
+                trueBtn.style.opacity = '0.6'; falseBtn.style.opacity = '0.6';
+                optionsDiv.appendChild(trueBtn);
+                optionsDiv.appendChild(falseBtn);
+                let isCorrect = state.userCorrect;
+                feedbackSpan.innerHTML = isCorrect ? '✅ Correct! ' + q.explanation : '❌ Oops! ' + q.explanation;
+                feedbackSpan.className = isCorrect ? 'feedback correct-fb' : 'feedback wrong-fb';
+            }
+            row.appendChild(optionsDiv);
+            row.appendChild(feedbackSpan);
+            quizContainer.appendChild(row);
+        });
+        updateQuizScoreUI();
+    }
+
+    function handleAnswer(qIdx, selectedBool, feedbackSpan, trueBtn, falseBtn) {
+        const q = quizQuestions[qIdx];
+        const isCorrect = (selectedBool === q.correct);
+        quizState[qIdx].answered = true;
+        quizState[qIdx].userCorrect = isCorrect;
+        // disable buttons
+        trueBtn.disabled = true;
+        falseBtn.disabled = true;
+        trueBtn.style.opacity = '0.6'; falseBtn.style.opacity = '0.6';
+        if (isCorrect) {
+            feedbackSpan.innerHTML = '✅ Correct! ' + q.explanation;
+            feedbackSpan.className = 'feedback correct-fb';
+        } else {
+            feedbackSpan.innerHTML = '❌ Not quite. ' + q.explanation;
+            feedbackSpan.className = 'feedback wrong-fb';
+        }
+        renderQuiz(); // re-render to update all states
+    }
+
+    function resetQuiz() {
+        quizState = quizQuestions.map(() => ({ answered: false, userCorrect: null }));
+        renderQuiz();
+    }
+
+    // initialise memo and quiz
+    function init() {
+        currentMemoCards = buildMemoArray().map(c => ({ ...c, flipped: false, matched: false }));
+        renderMemo();
+        renderQuiz();
+        document.getElementById('resetMemoBtn').addEventListener('click', resetMemoGame);
+        document.getElementById('resetQuizBtn').addEventListener('click', resetQuiz);
+    }
+
+    init();
+
+    // optional: add click on story words to read small? extra interactive
+    document.querySelectorAll('.story-text span').forEach(el => {
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', (e) => {
+            let txt = e.target.innerText;
+            speakText(txt);
+        });
+    });
+</script>
+</body>
+</html>
